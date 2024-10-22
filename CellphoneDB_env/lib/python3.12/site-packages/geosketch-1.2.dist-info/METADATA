@@ -1,0 +1,17 @@
+Metadata-Version: 2.1
+Name: geosketch
+Version: 1.2
+Summary: Geometry-preserving random sampling
+Home-page: https://github.com/brianhie/geosketch
+Author: Brian Hie
+Author-email: brianhie@mit.edu
+License: MIT
+Download-URL: https://github.com/brianhie/geosketch/archive/v1.2.tar.gz
+Platform: UNKNOWN
+Requires-Dist: fbpca (>=1.0)
+Requires-Dist: numpy (>=1.12.0)
+Requires-Dist: scikit-learn (>=0.24)
+
+UNKNOWN
+
+
