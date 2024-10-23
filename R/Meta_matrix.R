@@ -94,28 +94,8 @@ Meta_matrix <- function(ave_expr,
   allgenes = rownames(ave_expr)
 
   Synthetic_only = Synthetic_database[!names(Synthetic_database)%in%names(Transport_database)]
-  Transport_only = Transport_database[!names(Transport_database)%in%names(Synthetic_database)]
   Syn_both = Synthetic_database[names(Synthetic_database)%in%names(Transport_database)]
   Trans_both = Transport_database[names(Syn_both)]
-  ### Expression of Only Trans
-  trans_matrix = matrix(0, nrow = length(Transport_only), ncol = ncol(ave_expr))
-  rownames(trans_matrix) = names(Transport_only)
-  colnames(trans_matrix) = colnames(ave_expr)
-  for (i in 1:length(Transport_only)) {
-    transg = Transport_only[[i]]
-    Exp = matrix(NA, nrow = length(transg), ncol = ncol(ave_expr))
-    rownames(Exp) = transg
-    colnames(Exp) = colnames(ave_expr)
-    for (j in 1:length(transg)){
-      gene = unlist(strsplit(transg[[j]],split = " and "))
-      gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-      Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
-    }
-    Exp = na.omit(Exp)
-    matrix = colMeans(Exp)
-
-    trans_matrix[i,] = matrix
-  }
 
   ### Expression of Only Syns
   syns_matrix = matrix(0, nrow = length(Synthetic_only), ncol = ncol(ave_expr))
