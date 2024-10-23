@@ -4,11 +4,11 @@
 #' matrix based on gene expression. It assume that each columns are variables
 #' and column names are variable names. It assumes that rownames are gene symbols.
 #'
-#' @param infile "./raw"
+#' @param infile "./inst/extdata"
 #' @return A matrix of the infile
 #' @export
 
-Mega_matrix <- function(ave_expr,
+Meta_matrix <- function(ave_expr,
                         Synthetic_step2 = T,
                         precusor_transporter = T,
                         species = NULL){

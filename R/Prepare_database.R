@@ -1,8 +1,8 @@
 #' Creat 4 databases Synthetic_database, Transport_database, Synthetic_step2_database, Pre_Receptor_database
 #'
-#' This function loads LR database csv file, and creat 4 basic database which used for "Mega_matrix" function
+#' This function loads LR database csv file, and creat 4 basic database which used for "Meta_matrix" function
 #'
-#' @param infile "./raw"
+#' @param infile "./inst/extdata"
 #' @return A matrix of the infile
 #' @export
 
