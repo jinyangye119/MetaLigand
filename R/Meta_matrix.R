@@ -28,11 +28,11 @@ Meta_matrix <- function(ave_expr,
 
   # Input files
   if (species == "mouse"){
-    LR_data <- read.csv(system.file("extdata", "LR_data_mouse.csv", package = "MegaLigand"))
+    LR_data <- read.csv(system.file("extdata", "LR_data_mouse.csv", package = "MetaLigand"))
   } else if (species =="human"){
-    LR_data <- read.csv(system.file("extdata", "LR_data_human.csv", package = "MegaLigand"))
+    LR_data <- read.csv(system.file("extdata", "LR_data_human.csv", package = "MetaLigand"))
   } else {
-    LR_data <- read.csv(system.file("extdata", "LR_data_zebrafish.csv", package = "MegaLigand"))
+    LR_data <- read.csv(system.file("extdata", "LR_data_zebrafish.csv", package = "MetaLigand"))
   }
 
   # Creat all databases
