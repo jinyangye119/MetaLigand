@@ -12,7 +12,7 @@ MetaLigand is a full-featured R package for estimating non-peptide ligands abund
 
 <hr>
 
-## Quick Installation of LRLoop
+## Quick Installation of MetaLigand
 
 ```{r}
 # Install devtools
