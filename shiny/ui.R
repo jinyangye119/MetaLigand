@@ -1,18 +1,21 @@
 library(shiny)
 library(shinythemes)
 library(DT)
+library(Seurat)
 
 ui = fluidPage(
   theme = shinytheme(theme = "flatly"),
     navbarPage(
-    "MegaLigand",
+    "MetaLigand",
       tabPanel("Home",
-              h2("MegaLigand - An R toolkit for analyzing non-peptide ligands"),  # Main title for the home page
+              h2("MetaLigand - An R toolkit for analyzing non-peptide ligands"),  # Main title for the home page
               br(),
-              p("MegaLigand is a powerful tool for analyzing ligand data.
+              p("MetaLigand is a powerful tool for analyzing ligand data.
                     Use the tabs above to upload your data, run analyses, and download results."),
               p("This tool supports multiple species, including human, mouse, and zebrafish.
-                    Get started by navigating to the 'Analysis' tab.")
+                    Get started by navigating to the 'Analysis' tab."),
+              p("The overall design of MetaLigand is shown below:"),
+              img(src="Fig1.png", height="100%", width="100%", align = "center")
             ),
       tabPanel("Analysis",
              sidebarPanel(
@@ -41,6 +44,7 @@ ui = fluidPage(
             mainPanel(
               verbatimTextOutput("status")
               )
-            )
+            
+    )
       )
 )

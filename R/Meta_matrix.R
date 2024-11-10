@@ -181,6 +181,6 @@ Meta_matrix <- function(ave_expr,
     both_matrix[i,] = sqrt(matrix_syng * matrix_trans)
   }
 
-  all_matrix = rbind(syns_matrix,trans_matrix,both_matrix)
+  all_matrix = rbind(syns_matrix,both_matrix)
   return(all_matrix)
 }

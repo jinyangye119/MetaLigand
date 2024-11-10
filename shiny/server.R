@@ -9,10 +9,10 @@ server <- function(input, output) {
     # Read the uploaded file
     tryCatch({
       file_data <- read.csv(input$file1$datapath, row.names = 1)
-      Mega_out <- Mega_matrix(file_data, species = input$species)%>%
+      Meta_out <- Meta_matrix(file_data, species = input$species)%>%
         as.data.frame()  # Pass the selected species
 
-      analysis_data(Mega_out)  # Save the analysis results in the reactive variable
+      analysis_data(Meta_out)  # Save the analysis results in the reactive variable
 
       output$fileContents <- DT::renderDataTable(
        {DT::datatable(file_data%>%
@@ -21,7 +21,7 @@ server <- function(input, output) {
            extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller'))})
 
       output$analysisResults <- DT::renderDataTable(
-        {DT::datatable(Mega_out%>%
+        {DT::datatable(Meta_out%>%
                          mutate(across(is.numeric, round, digits = 2)),
                        rownames = TRUE,
                        extensions = c('Buttons', 'ColReorder', 'FixedHeader', 'Scroller'))})
