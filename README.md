@@ -112,6 +112,11 @@ FeaturePlot(Seurat_new,features = c("L-Glutamic acid","gamma-Aminobutyric acid")
                  legend.text = element_text(size=14,face = "plain"))
 ```
 
+
+<div  align="center">
+<img src="Figures/Fig3.png" width = "700" height = "250" alt="MetaLigand" align=center />
+</div>
+
 **Cell-cell communication**
 ```{r}
 
@@ -146,11 +151,6 @@ mySLRI = getLRIpval(seuratobj = Seurat_new, lr_network = LRdb,
 
 
 ```
-
-
-<div  align="center">
-<img src="Figures/Fig3.png" width = "700" height = "250" alt="MetaLigand" align=center />
-</div>
 
 <hr>
 
