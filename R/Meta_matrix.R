@@ -11,6 +11,8 @@
 Meta_matrix <- function(ave_expr,
                         Synthetic_step2 = T,
                         precusor_transporter = T,
+                        And_method = "gmean",
+                        Or_method = "mean",
                         species = NULL){
   suppressMessages(require(tidyverse))
 
@@ -25,7 +27,15 @@ Meta_matrix <- function(ave_expr,
   if (species%notin%c("mouse","human","zebrafish")){
     stop("species is required: mouse, human, zebrafish")
   }
-
+  
+  if (And_method%notin%c("gmean","min")){
+    stop("And_method is required: gmean, min")
+  }
+  
+  if (Or_method%notin%c("mean","max","sum","median")){
+    stop("Or_method is required: mean, max, sum,median")
+  }  
+  
   # Input files
   if (species == "mouse"){
     LR_data <- read.csv(system.file("extdata", "LR_data_mouse.csv", package = "MetaLigand"))
@@ -112,7 +122,11 @@ Meta_matrix <- function(ave_expr,
       Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
     }
     Exp = na.omit(Exp)
-    matrix = colMeans(Exp)
+    if (And_method == "gmean"){
+      matrix = colMeans(Exp)
+    } else {
+      matrix = apply(Exp, 2, min)
+    }
     if (is.null(Synthetic_step2_database)|names(Synthetic_only)[[i]] %notin% names(Synthetic_step2_database)){
       matrix_syng = matrix
     } else {
@@ -126,8 +140,20 @@ Meta_matrix <- function(ave_expr,
         Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
       }
       Exp = na.omit(Exp)
-      matrix_lv2 = colMeans(Exp)
-      matrix_syng = sqrt(matrix * matrix_lv2)
+      if (And_method == "gmean"){
+        matrix_lv2 = colMeans(Exp)
+      } else {
+        matrix_lv2 = apply(Exp, 2, min)
+      }
+      if (Or_method = "mean"){
+        matrix_syng = sqrt(matrix * matrix_lv2)
+      } else if (Or_method = "sum") {
+        matrix_syng = matrix + matrix_lv2
+      } else if (Or_method = "max") {
+        matrix_syng = max(matrix,matrix_lv2)
+      } else {
+        matrix_syng = median(matrix,matrix_lv2)
+      }  
     }
     syns_matrix[i,] = matrix_syng
   }
@@ -148,7 +174,11 @@ Meta_matrix <- function(ave_expr,
       Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
     }
     Exp = na.omit(Exp)
-    matrix = colMeans(Exp)
+    if (And_method == "gmean"){
+      matrix = colMeans(Exp)
+    } else {
+      matrix = apply(Exp, 2, min)
+    }                      
     if (is.null(Synthetic_step2_database)|names(Syn_both)[[i]] %notin% names(Synthetic_step2_database)){
       matrix_syng = matrix
     } else {
@@ -162,8 +192,20 @@ Meta_matrix <- function(ave_expr,
         Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
       }
       Exp = na.omit(Exp)
-      matrix_lv2 = colMeans(Exp)
-      matrix_syng = sqrt(matrix * matrix_lv2)
+      if (And_method == "gmean"){
+        matrix_lv2 = colMeans(Exp)
+      } else {
+        matrix_lv2 = apply(Exp, 2, min)
+      }
+      if (Or_method = "mean"){
+        matrix_syng = sqrt(matrix * matrix_lv2)
+      } else if (Or_method = "sum") {
+        matrix_syng = matrix + matrix_lv2
+      } else if (Or_method = "max") {
+        matrix_syng = max(matrix,matrix_lv2)
+      } else {
+        matrix_syng = median(matrix,matrix_lv2)
+      }  
     }
 
     transg = Trans_both[[i]]
@@ -176,9 +218,20 @@ Meta_matrix <- function(ave_expr,
       Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
     }
     Exp = na.omit(Exp)
-    matrix_trans = colMeans(Exp)
-
-    both_matrix[i,] = sqrt(matrix_syng * matrix_trans)
+    if (And_method == "gmean"){
+      matrix_trans = colMeans(Exp)
+    } else {
+      matrix_trans = apply(Exp, 2, min)
+    }   
+    if (Or_method = "mean"){
+       both_matrix[i,] = sqrt(matrix_syng * matrix_trans)
+     } else if (Or_method = "sum") {
+       both_matrix[i,] = matrix_syng + matrix_trans
+     } else if (Or_method = "max") {
+       both_matrix[i,] = max(matrix_syng,matrix_trans)
+     } else {
+       both_matrix[i,] = median(matrix_syng,matrix_trans)
+     }                        
   }
 
   all_matrix = rbind(syns_matrix,both_matrix)
