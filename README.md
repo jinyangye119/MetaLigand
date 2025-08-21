@@ -20,6 +20,7 @@ if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
 
 # Install required packages
 install.packages(c('tidyverse','Seurat','ggplot2','pheatmap'))
+BiocManager::install("scRecover")
 
 # Install MetaLigand
 devtools::install_github("https://github.com/jinyangye119/MetaLigand")
@@ -38,6 +39,7 @@ library(tidyverse)
 library(MetaLigand)
 library(pheatmap)
 library(Seurat)
+library(scRecover)
 
 ```
 
@@ -52,7 +54,11 @@ visp <- read.csv("vignettes/GSE115746_cells_exon_counts.csv.gz",header = T,row.n
 visp_meta <- read.csv("vignettes/GSE115746_complete_metadata_28706-cells.csv.gz")%>%
   dplyr::filter(sample_name%in%colnames(Visp))%>%
   column_to_rownames("sample_name")
-Visp <- Visp[,colnames(Visp)%in%rownames(meta_visp)]
+Visp <- Visp[,rownames(meta_visp)]
+
+# Optional: data imputation
+scRecover(counts = Visp, labels = meta_visp$cell_class, outputDir = "./outDir_scRecover/")
+
 ```
 
 ```{r}
