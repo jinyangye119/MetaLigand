@@ -119,7 +119,11 @@ Meta_matrix <- function(ave_expr,
     for (j in 1:length(synsg)){
       gene = unlist(strsplit(synsg[[j]],split = " and "))
       gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-      Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      if (And_method == "gmean"){
+        Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      } else {
+        Exp[j,] = apply(gene_exp, 2, min)
+      }  
     }
     Exp = na.omit(Exp)
     if (And_method == "gmean"){
@@ -137,7 +141,11 @@ Meta_matrix <- function(ave_expr,
       for (j in 1:length(synsg_step2)){
         gene = unlist(strsplit(synsg_step2[[j]],split = " and "))
         gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-        Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+        if (And_method == "gmean"){
+          Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+        } else {
+          Exp[j,] = apply(gene_exp, 2, min)
+        }  
       }
       Exp = na.omit(Exp)
       if (And_method == "gmean"){
@@ -171,7 +179,11 @@ Meta_matrix <- function(ave_expr,
     for (j in 1:length(synsg)){
       gene = unlist(strsplit(synsg[[j]],split = " and "))
       gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-      Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      if (And_method == "gmean"){
+        Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      } else {
+        Exp[j,] = apply(gene_exp, 2, min)
+      }  
     }
     Exp = na.omit(Exp)
     if (And_method == "gmean"){
@@ -189,7 +201,11 @@ Meta_matrix <- function(ave_expr,
       for (j in 1:length(synsg_step2)){
         gene = unlist(strsplit(synsg_step2[[j]],split = " and "))
         gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-        Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+        if (And_method == "gmean"){
+          Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+        } else {
+          Exp[j,] = apply(gene_exp, 2, min)
+        }  
       }
       Exp = na.omit(Exp)
       if (And_method == "gmean"){
@@ -215,7 +231,11 @@ Meta_matrix <- function(ave_expr,
     for (j in 1:length(transg)){
       gene = unlist(strsplit(transg[[j]],split = " and "))
       gene_exp = ave_expr[rownames(ave_expr)%in%gene,,drop=F]
-      Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      if (And_method == "gmean"){
+        Exp[j,] = apply(gene_exp, 2, function(x) exp(mean(log(x))))
+      } else {
+        Exp[j,] = apply(gene_exp, 2, min)
+      }  
     }
     Exp = na.omit(Exp)
     if (And_method == "gmean"){
