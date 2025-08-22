@@ -18,12 +18,6 @@ Meta_matrix <- function(ave_expr,
 
   `%notin%` <- Negate(`%in%`)
 
-  gm_mean <- function(x){
-    prod(x)^(1/length(x))
-  }
-
-  `%notin%` <- Negate(`%in%`)
-
   if (species%notin%c("mouse","human","zebrafish")){
     stop("species is required: mouse, human, zebrafish")
   }
