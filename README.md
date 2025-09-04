@@ -51,14 +51,14 @@ library(scRecover)
 ```{r}
 # Load VISP dataset
 visp <- read.csv("vignettes/GSE115746_cells_exon_counts.csv.gz",header = T,row.names = 1)
-visp_meta <- read.csv("vignettes/GSE115746_complete_metadata_28706-cells.csv.gz")%>%
+meta_visp <- read.csv("vignettes/GSE115746_complete_metadata_28706-cells.csv.gz")%>%
   dplyr::filter(sample_name%in%colnames(Visp))%>%
   column_to_rownames("sample_name")
 Visp <- Visp[,rownames(meta_visp)]
 
 # Optional: data imputation
-scRecover(counts = Visp, labels = meta_visp$cell_class, outputDir = "./outDir_scRecover/")
-visp = read.csv ("./outDir_scRecover/scRecover+scImpute.csv")
+#scRecover(counts = Visp, labels = meta_visp$cell_class, outputDir = "./outDir_scRecover/")
+#Visp = read.csv ("./outDir_scRecover/scRecover+scImpute.csv")
 
 ```
 
