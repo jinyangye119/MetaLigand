@@ -120,11 +120,15 @@ Meta_matrix <- function(ave_expr,
       }  
     }
     Exp = na.omit(Exp)
-    if (And_method == "gmean"){
-      matrix = colMeans(Exp)
-    } else {
-      matrix = apply(Exp, 2, min)
-    }
+    if (Or_method == "mean"){
+          matrix = colMeans(Exp)
+        } else if (Or_method == "max") {
+          matrix = apply(Exp, 2, max)
+        } else if (Or_method == "sum") {
+          matrix = apply(Exp, 2, sum)
+        }  else  {
+          matrix = apply(Exp, 2, median)
+        }
     if (is.null(Synthetic_step2_database)|names(Synthetic_only)[[i]] %notin% names(Synthetic_step2_database)){
       matrix_syng = matrix
     } else {
@@ -142,19 +146,19 @@ Meta_matrix <- function(ave_expr,
         }  
       }
       Exp = na.omit(Exp)
-      if (And_method == "gmean"){
-        matrix_lv2 = colMeans(Exp)
-      } else {
-        matrix_lv2 = apply(Exp, 2, min)
-      }
-      if (Or_method = "mean"){
+      if (Or_method == "mean"){
+            matrix_lv2 = colMeans(Exp)
+          } else if (Or_method == "max") {
+            matrix_lv2 = apply(Exp, 2, max)
+          } else if (Or_method == "sum") {
+            matrix_lv2 = apply(Exp, 2, sum)
+          }  else  {
+            matrix_lv2 = apply(Exp, 2, median)
+          }                          
+      if (And_method = "gmean"){
         matrix_syng = sqrt(matrix * matrix_lv2)
-      } else if (Or_method = "sum") {
-        matrix_syng = matrix + matrix_lv2
-      } else if (Or_method = "max") {
-        matrix_syng = max(matrix,matrix_lv2)
       } else {
-        matrix_syng = median(matrix,matrix_lv2)
+        matrix_syng = min(matrix,matrix_lv2)
       }  
     }
     syns_matrix[i,] = matrix_syng
@@ -180,11 +184,15 @@ Meta_matrix <- function(ave_expr,
       }  
     }
     Exp = na.omit(Exp)
-    if (And_method == "gmean"){
-      matrix = colMeans(Exp)
-    } else {
-      matrix = apply(Exp, 2, min)
-    }                      
+    if (Or_method == "mean"){
+          matrix = colMeans(Exp)
+        } else if (Or_method == "max") {
+          matrix = apply(Exp, 2, max)
+        } else if (Or_method == "sum") {
+          matrix = apply(Exp, 2, sum)
+        }  else  {
+          matrix = apply(Exp, 2, median)
+        }               
     if (is.null(Synthetic_step2_database)|names(Syn_both)[[i]] %notin% names(Synthetic_step2_database)){
       matrix_syng = matrix
     } else {
@@ -202,19 +210,19 @@ Meta_matrix <- function(ave_expr,
         }  
       }
       Exp = na.omit(Exp)
-      if (And_method == "gmean"){
-        matrix_lv2 = colMeans(Exp)
-      } else {
-        matrix_lv2 = apply(Exp, 2, min)
-      }
-      if (Or_method = "mean"){
+      if (Or_method == "mean"){
+            matrix_lv2 = colMeans(Exp)
+          } else if (Or_method == "max") {
+            matrix_lv2 = apply(Exp, 2, max)
+          } else if (Or_method == "sum") {
+            matrix_lv2 = apply(Exp, 2, sum)
+          }  else  {
+            matrix_lv2 = apply(Exp, 2, median)
+          }
+      if (And_method = "gmean"){
         matrix_syng = sqrt(matrix * matrix_lv2)
-      } else if (Or_method = "sum") {
-        matrix_syng = matrix + matrix_lv2
-      } else if (Or_method = "max") {
-        matrix_syng = max(matrix,matrix_lv2)
       } else {
-        matrix_syng = median(matrix,matrix_lv2)
+        matrix_syng = min(matrix,matrix_lv2)
       }  
     }
 
@@ -232,19 +240,19 @@ Meta_matrix <- function(ave_expr,
       }  
     }
     Exp = na.omit(Exp)
-    if (And_method == "gmean"){
-      matrix_trans = colMeans(Exp)
-    } else {
-      matrix_trans = apply(Exp, 2, min)
-    }   
-    if (Or_method = "mean"){
+    if (Or_method == "mean"){
+          matrix_trans = colMeans(Exp)
+        } else if (Or_method == "max") {
+          matrix_trans = apply(Exp, 2, max)
+        } else if (Or_method == "sum") {
+          matrix_trans = apply(Exp, 2, sum)
+        }  else  {
+          matrix_trans = apply(Exp, 2, median)
+        }                              
+    if (And_method = "gmean"){
        both_matrix[i,] = sqrt(matrix_syng * matrix_trans)
-     } else if (Or_method = "sum") {
-       both_matrix[i,] = matrix_syng + matrix_trans
-     } else if (Or_method = "max") {
-       both_matrix[i,] = max(matrix_syng,matrix_trans)
      } else {
-       both_matrix[i,] = median(matrix_syng,matrix_trans)
+       both_matrix[i,] = min(matrix_syng,matrix_trans)
      }                        
   }
 
