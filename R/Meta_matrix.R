@@ -155,7 +155,7 @@ Meta_matrix <- function(ave_expr,
           }  else  {
             matrix_lv2 = apply(Exp, 2, median)
           }                          
-      if (And_method = "gmean"){
+      if (And_method == "gmean"){
         matrix_syng = sqrt(matrix * matrix_lv2)
       } else {
         matrix_syng = min(matrix,matrix_lv2)
@@ -219,7 +219,7 @@ Meta_matrix <- function(ave_expr,
           }  else  {
             matrix_lv2 = apply(Exp, 2, median)
           }
-      if (And_method = "gmean"){
+      if (And_method == "gmean"){
         matrix_syng = sqrt(matrix * matrix_lv2)
       } else {
         matrix_syng = min(matrix,matrix_lv2)
@@ -249,7 +249,7 @@ Meta_matrix <- function(ave_expr,
         }  else  {
           matrix_trans = apply(Exp, 2, median)
         }                              
-    if (And_method = "gmean"){
+    if (And_method == "gmean"){
        both_matrix[i,] = sqrt(matrix_syng * matrix_trans)
      } else {
        both_matrix[i,] = min(matrix_syng,matrix_trans)
