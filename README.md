@@ -1,168 +1,129 @@
-
 # MetaLigand
 
-MetaLigand is a full-featured R package for estimating non-peptide ligands abundance from bulk & single-cell RNA-seq data.
-(MetaLigand is currently in beta and will be in active development through the peer review process.)
+MetaLigand is an R package for estimating non-peptide ligand (NPL) activity
+from bulk and single-cell transcriptomic data. It combines curated synthesis,
+transporter, precursor-transport, and receptor gene sets to infer metabolite- and
+lipid-related signaling programs that are not captured by peptide-only
+ligand-receptor databases.
+
+MetaLigand is in active development and should currently be treated as a beta
+research package.
 
 <hr>
 
-<div  align="center">
-<img src="Figures/Fig1.png" width = "850" height = "300" alt="MetaLigand" align=center />
+<div align="center">
+<img src="Figures/Fig1.png" width="850" height="300" alt="MetaLigand workflow" align="center" />
 </div>
 
 <hr>
 
-## Quick Installation of MetaLigand
+## Installation
 
-```{r}
-# Install devtools
-if (!requireNamespace("devtools", quietly = TRUE)) install.packages("devtools")
-
-# Install required packages
-install.packages(c('tidyverse','Seurat','ggplot2','pheatmap'))
-BiocManager::install("scRecover")
-
-# Install MetaLigand
-devtools::install_github("https://github.com/jinyangye119/MetaLigand")
+```r
+install.packages("remotes")
+remotes::install_github("jinyangye119/MetaLigand")
 ```
 
-<hr>
+Common analysis dependencies:
 
-## Learn to use MetaLigand
+```r
+install.packages(c("dplyr", "ggplot2", "pheatmap", "Seurat"))
+```
 
-**load datasets and packages**
-- List of NPLs and their associated synthetic and transporter genes were stored in .csv format under inst/extdata/
-- List of datasets used in vignettes are availble under vignettes/
+## Main Features
 
-```{r}
-library(tidyverse)
+- Estimate NPL activity matrices from normalized gene-expression matrices.
+- Support human, mouse, and zebrafish ligand databases.
+- Integrate inferred NPL activity into Seurat objects as a separate assay.
+- Score NPL-receptor and peptide ligand-receptor interactions across cell
+  groups and sample conditions.
+- Run permutation-based p-value estimation for selected sender-receiver pairs.
+
+## Quick Start
+
+```r
 library(MetaLigand)
-library(pheatmap)
-library(Seurat)
-library(scRecover)
 
-```
-
-**Testing MetaLigand on a single-cell RNA-seq dataset**
-- A single-cell transcriptomic database of adult mouse visual cortex was used for testing (https://doi.org/10.1038/s41586-018-0654-5)
-- Raw gene expression matrix and metadata were downloaded from GEO-GSE115746 and stored under vignettes/
-
-
-```{r}
-# Load VISP dataset
-visp <- read.csv("vignettes/GSE115746_cells_exon_counts.csv.gz",header = T,row.names = 1)
-meta_visp <- read.csv("vignettes/GSE115746_complete_metadata_28706-cells.csv.gz")%>%
-  dplyr::filter(sample_name%in%colnames(Visp))%>%
-  column_to_rownames("sample_name")
-Visp <- Visp[,rownames(meta_visp)]
-
-# Optional: data imputation
-#scRecover(counts = Visp, labels = meta_visp$cell_class, outputDir = "./outDir_scRecover/")
-#Visp = read.csv ("./outDir_scRecover/scRecover+scImpute.csv")
-
-```
-
-```{r}
-# This is standard Seurat pipeline, to visulize data before MetaLigand
-# If you just want a NPL table, skip this step
-Seurat<- CreateSeuratObject(
-  counts = Visp,
-  meta.data = meta_visp
+# Normalized gene x cell or gene x sample matrix with gene symbols as row names.
+npl_matrix <- Meta_matrix(
+  ave_expr = normalized_expression,
+  species = "mouse",
+  And_method = "gmean",
+  Or_method = "mean"
 )
-Seurat <- NormalizeData(Seurat)
-Seurat <- FindVariableFeatures(Seurat)
-Seurat <- ScaleData(Seurat)
-Seurat <- RunPCA(Seurat)
-Seurat <- FindNeighbors(Seurat,reduction = "pca", dims = 1:30)
-Seurat <- FindClusters(Seurat,reduction = "pca", resolution = 0.5)
-Seurat <- RunUMAP(Seurat,reduction = "pca", dims = 1:30)
-Seurat <- subset(Seurat,cell_subclass%in%c("","Batch Grouping","Doublet","High Intronic","No Class","Low Quality"),invert=T)
-Seurat$new_group <- paste(Seurat$cell_class,Seurat$cell_subclass,sep = "_")
-DimPlot(Seurat,group.by = "new_group",label = T)
+
+npl_matrix <- npl_matrix[rowSums(is.na(npl_matrix)) == 0, , drop = FALSE]
 ```
 
+## Seurat Integration
 
-<div  align="center">
-<img src="Figures/Fig2.png" width = "850" height = "250" alt="MetaLigand" align=center />
-</div>
+```r
+library(Seurat)
 
-```{r}
-# Now we run MetaLigand
-# Note that the input file should be normalized gene x Cell matrix from single-cell RNAseq, or normalized gene x sample matrix from bulk RNAseq.
+seurat_obj[["NPL_assay"]] <- CreateAssayObject(data = npl_matrix)
+DefaultAssay(seurat_obj) <- "NPL_assay"
 
-# First extract normalized gene x cell matrix from seurat
-sc_input = Seurat@assays$RNA@data%>%
-  as.matrix()
-
-# Generate NPL matrix
-NPL_matrix = Meta_matrix(sc_input,
-                        species = "mouse",
-                        And_method = "gmean",
-                        Or_method = "mean",)
-NPL_matrix = NPL_matrix[rowSums(is.na(NPL_matrix))==0,]
-
+FeaturePlot(
+  seurat_obj,
+  features = c("L-Glutamic acid", "gamma-Aminobutyric acid")
+)
 ```
 
-```{r}
-# Integrate NPL matrix into seurat object
+## Cell-Cell Communication Workflow
 
-Seurat_new = Seurat
-NPL_assay = CreateAssayObject(data=NPL_matrix)
+MetaLigand expects cell-type and condition labels in `seurat_obj@meta.data`:
 
-Seurat_new[["NPL_assay"]] = NPL_assay
+```r
+seurat_obj$cl <- seurat_obj$cell_type
+seurat_obj$cond <- seurat_obj$condition
 
-# Visulize GABA and Glutamate on umap and violin plot
-DefaultAssay(Seurat_new) <- "NPL_assay"
-FeaturePlot(Seurat_new,features = c("L-Glutamic acid","gamma-Aminobutyric acid"),label = F,min.cutoff = "q10",ncol = 1)&
-  ggplot2::theme(legend.position = "right",
-                 panel.background  = element_rect(colour = "black", size=0.8),
-                 text=element_text(size = 14),
-                 axis.text = element_text(size = 14),
-                 strip.text =element_text(size = 14),
-                 legend.text = element_text(size=14,face = "plain"))
+exprinfo <- getExprInfo(seurat_obj)
 ```
 
+Load or construct a ligand-receptor network with columns `L` and `R`, where
+multi-subunit ligands or receptors use semicolon-separated gene symbols:
 
-<div  align="center">
-<img src="Figures/Fig3.png" width = "700" height = "250" alt="MetaLigand" align=center />
-</div>
+```r
+nplr_db <- read.csv(system.file("extdata", "NPLRdb_human.csv", package = "MetaLigand"))
+nplr_db <- nplr_db[, c("L", "R")]
 
-**Cell-cell communication**
-```{r}
-
-# Load NPL-R interactions
-NPLRdb = read.csv("NPLRdb_human.csv")
-NPLRdb = NPLRdb[,c("L", "R")]
-# (optional) Load a peptide L-R interaction network, here we use the network used in the R package "LRLoop" as an example,
-# the network matrix should have columns "L" and "R", ligands/receptors with multiple units should have the units conneted by ";" like "unitA;unitB;unitC".
-PLRdb = read.csv("PLRdb_human.csv")
-PLRdb = PLRdb[,c("L", "R")]
-# Combine NPL and peptide LRs
-NPLRdb$LType = "NPL"
-PLRdb$LType = "PL"
-LRdb = rbind.data.frame(NPLRdb, PLRdb)
-
-# define sample conditions and cell-types/clusters in the columns "cond" and "cl" of the meta.data
-Seurat_new$cl = Seurat_new$new_group
-Seurat_new$cond = Seurat_new$donor_sex
-
-# Get detection rates and average NPL and gene levels
-exprinfo = getExprInfo(Seurat_new)
-
-# Get interaction scores of all LR pairs for all pairs of cell-types/clusters in each sample condition
-# Remark; can be time consuming when there are many cell-types/clusters
-SLRIlist = getLRIScore(lr_network = LRdb, exprinfo = exprinfo, LRI.method = "scsigr")
-
-# For a particular cell type/cluster-pair and sample condition of interest, get the interaction scores and p-values (generated by permutations).
-mySLRI = getLRIpval(seuratobj = Seurat_new, lr_network = LRdb, 
-                    cl_from = "GABAergic_Lamp5", cl_to = "GABAergic_Vip", cond = "F", 
-                    avgexprall = exprinfo$avgexprall, LRI.method = "scsigr", numperm = 100)
-
-
+score_list <- getLRIScore(
+  lr_network = nplr_db,
+  exprinfo = exprinfo,
+  LRI.method = "scsigr"
+)
 ```
 
-<hr>
+For a selected sender-receiver pair and condition:
 
-## Issues using MetaLigand?
+```r
+pval_table <- getLRIpval(
+  seuratobj = seurat_obj,
+  lr_network = nplr_db,
+  cl_from = "GABAergic_Lamp5",
+  cl_to = "GABAergic_Vip",
+  cond = "F",
+  avgexprall = exprinfo$avgexprall,
+  LRI.method = "scsigr",
+  numperm = 100
+)
+```
 
-MetaLigand is currently in __beta__. If you think you have found a bug, please [report an issue on Github](https://github.com/jinyangye119/MetaLigand/issues) with the __Bug Report__ form.
+## Repository Contents
+
+```text
+R/                 # Package functions
+inst/extdata/      # Curated NPL, receptor, synthesis, and transporter tables
+Figures/           # Workflow and example figures
+vignettes/         # Example metadata used in development
+shiny/             # Prototype Shiny app files
+```
+
+## Notes
+
+- Input expression should be normalized before calling `Meta_matrix()`.
+- Row names must be gene symbols matching the selected species database.
+- Increase `numperm` for publication analysis and set a random seed before
+  permutation workflows.
+- Please open an issue if you find a bug or have a use case that is not covered
+  by the current beta API.

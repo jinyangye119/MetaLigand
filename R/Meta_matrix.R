@@ -1,24 +1,41 @@
-#' Creat a ligand expression matrix
+#' Create a ligand expression matrix
 #'
-#' This function loads gene expression matrix and calulate ligand expression
-#' matrix based on gene expression. It assume that each columns are variables
-#' and column names are variable names. It assumes that rownames are gene symbols.
+#' This function loads a gene expression matrix and calculates ligand activity
+#' based on curated synthesis, transporter, and receptor gene sets. Columns are
+#' samples or cells, and row names are gene symbols.
 #'
-#' @param infile "./inst/extdata"
-#' @return A matrix of the infile
+#' @param ave_expr Normalized gene expression matrix with gene symbols as row names.
+#' @param Synthetic_step2 Whether to include second-step synthesis genes.
+#' @param precursor_transporter Whether to include precursor transporter genes.
+#' @param And_method Method for combining required genes: "gmean" or "min".
+#' @param Or_method Method for combining alternative genes: "mean", "max", "sum", or "median".
+#' @param species Species database to use: "mouse", "human", or "zebrafish".
+#' @param precusor_transporter Deprecated misspelling retained for compatibility.
+#' @return A non-peptide ligand activity matrix.
 #' @export
 
 Meta_matrix <- function(ave_expr,
-                        Synthetic_step2 = T,
-                        precusor_transporter = T,
+                        Synthetic_step2 = TRUE,
+                        precursor_transporter = TRUE,
                         And_method = "gmean",
                         Or_method = "mean",
-                        species = NULL){
-  suppressMessages(require(tidyverse))
+                        species = NULL,
+                        precusor_transporter = NULL){
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("Package 'dplyr' is required.")
+  }
+  if (!requireNamespace("magrittr", quietly = TRUE)) {
+    stop("Package 'magrittr' is required.")
+  }
 
+  `%>%` <- magrittr::`%>%`
   `%notin%` <- Negate(`%in%`)
 
-  if (species%notin%c("mouse","human","zebrafish")){
+  if (!is.null(precusor_transporter)) {
+    precursor_transporter <- precusor_transporter
+  }
+
+  if (is.null(species) || species %notin% c("mouse","human","zebrafish")){
     stop("species is required: mouse, human, zebrafish")
   }
   
@@ -39,7 +56,7 @@ Meta_matrix <- function(ave_expr,
     LR_data <- read.csv(system.file("extdata", "LR_data_zebrafish.csv", package = "MetaLigand"))
   }
 
-  # Creat all databases
+  # Create all databases
   All_synthetic = LR_data%>%
     dplyr::filter(!Synthetic_genes=="")%>%
     dplyr::select(Compounds, Synthetic_genes)
@@ -72,7 +89,7 @@ Meta_matrix <- function(ave_expr,
     x <- x[nzchar(x)]
   })
 
-  if (Synthetic_step2 == T){
+  if (Synthetic_step2 == TRUE){
   Synthetic_step2_database = lapply(X = All_synthetic_lv2, FUN = function(x) {
     x <- unlist(strsplit(x$Synthetic_genes_lv2,split = ","))
   })  } else {
@@ -87,11 +104,11 @@ Meta_matrix <- function(ave_expr,
     x <- unlist(strsplit(x$Receptor_genes,split = ","))
   })
 
-  if (precusor_transporter == T){
+  if (precursor_transporter == TRUE){
   Pre_trans_database = lapply(X = All_pre_receptor, FUN = function(x) {
     x <- unlist(strsplit(x$precursor_transport,split = ","))
   })  } else {
-    Synthetic_step2_database = NULL
+    Pre_trans_database = NULL
   }
 
   #Check genes with expression database

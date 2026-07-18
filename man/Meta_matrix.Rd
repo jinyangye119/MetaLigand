@@ -2,18 +2,38 @@
 % Please edit documentation in R/Meta_matrix.R
 \name{Meta_matrix}
 \alias{Meta_matrix}
-\title{Creat a ligand expression matrix}
+\title{Create a ligand expression matrix}
 \usage{
-Meta_matrix(ave_expr, All_database,Synthetic_step2,Transporter,precusor_transporter)
+Meta_matrix(
+  ave_expr,
+  Synthetic_step2 = TRUE,
+  precursor_transporter = TRUE,
+  And_method = "gmean",
+  Or_method = "mean",
+  species = NULL,
+  precusor_transporter = NULL
+)
 }
 \arguments{
-\item{infile}{"./raw"}
+\item{ave_expr}{Normalized gene expression matrix with gene symbols as row names.}
+
+\item{Synthetic_step2}{Whether to include second-step synthesis genes.}
+
+\item{precursor_transporter}{Whether to include precursor transporter genes.}
+
+\item{And_method}{Method for combining required genes: \code{"gmean"} or \code{"min"}.}
+
+\item{Or_method}{Method for combining alternative genes: \code{"mean"}, \code{"max"}, \code{"sum"}, or \code{"median"}.}
+
+\item{species}{Species database to use: \code{"mouse"}, \code{"human"}, or \code{"zebrafish"}.}
+
+\item{precusor_transporter}{Deprecated misspelling retained for compatibility.}
 }
 \value{
-A matrix of the infile
+A non-peptide ligand activity matrix.
 }
 \description{
-This function loads gene expression matrix and calulate ligand expression
-matrix based on gene expression. It assume that each columns are variables
-and column names are variable names. It assumes that rownames are gene symbols.
+This function loads a gene expression matrix and calculates ligand activity
+based on curated synthesis, transporter, and receptor gene sets. Columns are
+samples or cells, and row names are gene symbols.
 }

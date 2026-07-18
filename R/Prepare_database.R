@@ -1,26 +1,39 @@
-#' Creat 4 databases Synthetic_database, Transport_database, Synthetic_step2_database, Pre_Receptor_database
+#' Create MetaLigand database lists
 #'
-#' This function loads LR database csv file, and creat 4 basic database which used for "Meta_matrix" function
+#' This function loads the ligand-receptor database CSV file and creates the
+#' database lists used by `Meta_matrix()`.
 #'
-#' @param infile "./inst/extdata"
-#' @return A matrix of the infile
+#' @param LR_data Optional ligand-receptor database table. If `NULL`, the
+#' database bundled for `species` is loaded.
+#' @param species Species database to use: "mouse", "human", or "zebrafish".
+#' @return A named list containing synthesis, transporter, receptor, and
+#' precursor transporter gene databases.
 #' @export
 
-Prepare_databse <- function(LR_data=NULL,
+Prepare_database <- function(LR_data=NULL,
                             species = NULL){
-
-  `%notin%` <- Negate(`%in%`)
-
-  if (species%notin%c("mouse","human","zebrafish")){
-  stop("species is required: mouse, human, zebrafish")
+  if (!requireNamespace("dplyr", quietly = TRUE)) {
+    stop("Package 'dplyr' is required.")
+  }
+  if (!requireNamespace("magrittr", quietly = TRUE)) {
+    stop("Package 'magrittr' is required.")
   }
 
-  if (species == "mouse"){
-    LR_data <- read.csv(system.file("extdata", "LR_data_mouse.csv", package = "MegaLigand"))
-  } else if (species =="human"){
-    LR_data <- read.csv(system.file("extdata", "LR_data_human.csv", package = "MegaLigand"))
-  } else {
-    LR_data <- read.csv(system.file("extdata", "LR_data_zebrafish.csv", package = "MegaLigand"))
+  `%>%` <- magrittr::`%>%`
+  `%notin%` <- Negate(`%in%`)
+
+  if (is.null(LR_data)) {
+    if (is.null(species) || species %notin% c("mouse","human","zebrafish")){
+      stop("species is required when LR_data is not provided: mouse, human, zebrafish")
+    }
+
+    if (species == "mouse"){
+      LR_data <- read.csv(system.file("extdata", "LR_data_mouse.csv", package = "MetaLigand"))
+    } else if (species =="human"){
+      LR_data <- read.csv(system.file("extdata", "LR_data_human.csv", package = "MetaLigand"))
+    } else {
+      LR_data <- read.csv(system.file("extdata", "LR_data_zebrafish.csv", package = "MetaLigand"))
+    }
   }
 
   All_synthetic = LR_data%>%
@@ -73,4 +86,3 @@ Prepare_databse <- function(LR_data=NULL,
 
   return(All_database)
 }
-
